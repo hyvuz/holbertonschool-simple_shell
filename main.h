@@ -6,7 +6,7 @@
  * Author: Haneen Aldawood, Munirah Faqihi
  * Description: Header file for the simple shell project.
  * Contains function prototypes and standard libraries.
- */
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
