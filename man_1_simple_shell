@@ -1,0 +1,125 @@
+.TH HSH 1 "April 2025" "1.0" "User Commands"
+.SH NAME
+hsh \- A simple Unix shell clone for educational purposes
+.SH SYNOPSIS
+.B hsh
+.RI [ file ]
+.br
+Reads commands either interactively from standard input or from a file if provided.
+.SH DESCRIPTION
+.B hsh
+is a minimalistic Unix shell developed to emulate basic shell behavior. It supports both
+interactive and non-interactive modes, allowing users to execute commands, including some built-in commands.
+
+In
+.B interactive mode,
+the shell prompts the user to input commands line-by-line.
+
+In
+.B non-interactive mode,
+commands are read from a file or piped from another command.
+
+This shell is built as part of a software engineering curriculum to demonstrate the inner workings of command interpreters using C and system calls.
+
+.SH COMMANDS
+The following built-in commands are supported:
+.TP
+.B exit
+Exits the shell with the given status. If no status is provided, exits with the status of the last command.
+
+.TP
+.B env
+Displays the current environment variables.
+
+.SH OPTIONS
+There are no command-line options supported. The shell can only accept an optional script
+.IR file
+to read commands from.
+
+.SH EXAMPLES
+.TP
+Run the shell interactively:
+.B
+$ ./hsh
+.br
+($) ls -l
+.br
+($) exit
+
+.TP
+Run a single command via piping (non-interactive):
+.B
+$ echo "ls -1" | ./hsh
+
+.TP
+Execute a script of commands:
+.B
+$ cat commands.txt
+.br
+ls -l
+.br
+env
+.br
+$ ./hsh commands.txt
+
+.TP
+Attempt to run an unsupported command:
+.B
+$ echo "foobar" | ./hsh
+.br
+./hsh: 1: foobar: not found
+
+.SH LIMITATIONS
+hsh is intended for educational purposes and is not feature-complete. It does not currently support:
+.RS
+\- Advanced features like piping, redirection, or command history
+.br
+\- Aliases or shell scripting constructs (e.g., if, while, functions)
+.br
+\- User customization files like .bashrc
+.br
+\- Background process execution (&)
+.RE
+
+These limitations are intentional, as
+.B hsh
+was developed to reinforce core Unix system concepts including process management and environment handling.
+
+.SH AUTHORS
+.TP
+Haneen Aldawood <https://github.com/hyvuz> 
+.br
+Munirah Faqihi <https://github.com/MuFaqihi>
+
+See the AUTHORS file for a full list of contributors and roles.
+
+.SH NOTES
+.B Compilation:
+.br
+gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
+
+.B Style:
+.br
+All code follows the Betty style guide. No memory leaks or warnings are tolerated.
+
+.SH RESOURCES
+.TP
+Ken Thompson (creator of Unix and B language):
+https://en.wikipedia.org/wiki/Ken_Thompson
+.TP
+UNIX Shell basics:
+https://en.wikipedia.org/wiki/Unix_shell
+.TP
+Manual for sh:
+.B
+man sh
+
+.SH SEE ALSO
+.BR sh (1),
+.BR bash (1),
+.BR execve (2),
+.BR fork (2),
+.BR wait (2),
+.BR getline (3),
+.BR strtok (3)
+
