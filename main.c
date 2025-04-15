@@ -7,55 +7,56 @@
 
 #define PROMPT "#cisfun$ "
 
-extern char **environ; /* Environment variables for execve */
+extern char **environ;
 
 /**
- * main - Entry point for the simple shell
+ * main - A simple shell that supports command with arguments
  *
- * Return: Always 0 on success
+ * Return: Always 0
  */
 int main(void)
 {
-	char *line = NULL;
+	char *line = NULL, *token = NULL;
 	size_t len = 0;
 	ssize_t read;
 	pid_t pid;
 	int status;
+	char *argv[100]; /* array to hold arguments */
+	int i;
 
 	while (1)
 	{
-		/* Display prompt only in interactive mode */
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 
-		/* Read user input */
 		read = getline(&line, &len, stdin);
 
-		/* Handle EOF (Ctrl+D) */
 		if (read == -1)
 		{
 			free(line);
 			exit(0);
 		}
 
-		/* Remove newline at the end */
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Skip empty lines */
 		if (line[0] == '\0')
 			continue;
+
+		/* Tokenize input line */
+		i = 0;
+		token = strtok(line, " ");
+		while (token != NULL)
+		{
+			argv[i++] = token;
+			token = strtok(NULL, " ");
+		}
+		argv[i] = NULL;
 
 		pid = fork();
 		if (pid == 0)
 		{
-			/* Child process */
-			char *argv[2];
-
-			argv[0] = line;
-			argv[1] = NULL;
-
-			if (execve(line, argv, environ) == -1)
+			if (execve(argv[0], argv, environ) == -1)
 			{
 				perror("./hsh");
 				exit(EXIT_FAILURE);
@@ -63,12 +64,10 @@ int main(void)
 		}
 		else if (pid > 0)
 		{
-			/* Parent process waits for child */
 			wait(&status);
 		}
 		else
 		{
-			/* Fork error */
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
