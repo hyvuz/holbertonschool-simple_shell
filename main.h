@@ -18,5 +18,6 @@
 extern char **environ;
 int _strcmp(char *s1, char *s2);
 int _strlen(const char *s);
+int is_blank_line(char *line);
 
 #endif
