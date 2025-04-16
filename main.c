@@ -1,78 +1,56 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#define PROMPT "#cisfun$ "
-
-extern char **environ;
+#include "main.h"
 
 /**
- * main - A simple shell that supports command with arguments
+ * main - entry point for the shell
+ * @ac: argument count
+ * @av: argument vector
  *
- * Return: Always 0
+ * Return: 0 on success
  */
-int main(void)
+int main(int ac, char **av)
 {
-	char *line = NULL, *token = NULL;
-	size_t len = 0;
-	ssize_t read;
-	pid_t pid;
-	int status;
-	char *argv[100]; /* array to hold arguments */
-	int i;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t nread;
+    pid_t pid;
+    (void)ac;
 
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+    while (1)
+    {
+        if (isatty(STDIN_FILENO))
+            write(1, "#cisfun$ ", 9);
 
-		read = getline(&line, &len, stdin);
+        nread = getline(&line, &len, stdin);
+        if (nread == -1)
+        {
+            free(line);
+            exit(0);
+        }
 
-		if (read == -1)
-		{
-			free(line);
-			exit(0);
-		}
+        line[nread - 1] = '\0';
 
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
+        if (_strlen(line) == 0)
+            continue;
 
-		if (line[0] == '\0')
-			continue;
+        pid = fork();
+        if (pid == 0)
+        {
+            char *argv[2];
+            argv[0] = line;
+            argv[1] = NULL;
 
-		/* Tokenize input line */
-		i = 0;
-		token = strtok(line, " ");
-		while (token != NULL)
-		{
-			argv[i++] = token;
-			token = strtok(NULL, " ");
-		}
-		argv[i] = NULL;
+            if (execve(line, argv, environ) == -1)
+            {
+                perror(av[0]);
+                exit(1);
+            }
+        }
+        else if (pid > 0)
+            wait(NULL);
+        else
+            perror("fork failed");
+    }
 
-		pid = fork();
-		if (pid == 0)
-		{
-			if (execve(argv[0], argv, environ) == -1)
-			{
-				perror("./hsh");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else if (pid > 0)
-		{
-			wait(&status);
-		}
-		else
-		{
-			perror("fork");
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	free(line);
-	return (0);
+    free(line);
+    return (0);
 }
