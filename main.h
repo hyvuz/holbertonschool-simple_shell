@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
+
 /* Function Prototypes */
 int is_blank_line(char *line);
 char *get_input(void);
