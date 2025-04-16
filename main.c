@@ -29,8 +29,8 @@ int main(int ac, char **av)
 
         line[nread - 1] = '\0';
 
-        if (_strlen(line) == 0)
-            continue;
+        if (is_blank_line(line))
+	continue;
 
         pid = fork();
         if (pid == 0)
