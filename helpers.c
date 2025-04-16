@@ -68,6 +68,7 @@ free(args);
  * get_input - Reads a line of input from stdin
  * Return: Pointer to the input string, or NULL on failure
 */
+
 char *get_input(void)
 {
 char *line = NULL;
