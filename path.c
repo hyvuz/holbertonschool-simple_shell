@@ -6,6 +6,7 @@
  *
  * Return: Value of the variable or NULL if not found
 */
+
 char *get_env_var(const char *name)
 {
 int i;
