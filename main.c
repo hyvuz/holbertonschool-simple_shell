@@ -12,23 +12,45 @@
  * main - Entry point for the simple shell
  * Return: Always 0
  */
+
+/**
 int main(void)
 {
 	char *line = NULL;
 	char *argv[100];
 
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 
-		line = read_input();
-		if (!line)
-			continue;
+*	while (1)
+*	{
+*		if (isatty(STDIN_FILENO))
+*			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+*
+*		line = read_input();
+*		if (!line)
+*			continue;
+*
+*		parse_input(line, argv);
+*		run_command(argv, line);
+*	}
+*
+*	return (0);
+*/
+int last_exit_status = 0;
 
-		parse_input(line, argv);
-		run_command(argv, line);
-	}
+int main(void)
+{
+        char *line = NULL;
+        char *argv[100];
 
-	return (0);
+        if (isatty(STDIN_FILENO))
+                write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+
+        line = read_input();
+        if (!line)
+                return (0);
+
+        parse_input(line, argv);
+        run_command(argv, line);
+
+        return (last_exit_status);
 }
