@@ -36,10 +36,12 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 1. Compile the project:
 ```bash
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
-
+```
+```bash
 2. Run the shell:
 ./hsh
-
+```
+```bash
 3. Example:
 $ ./hsh
 ($) ls
@@ -47,7 +49,7 @@ main.c shell.c README.md
 ($) /bin/pwd
 /home/username
 ($) exit
-
+```
 
 ---
 
