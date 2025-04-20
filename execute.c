@@ -16,7 +16,7 @@ void run_command(char **argv, char *line)
 {
 	pid_t pid;
 	int status;
-	char *cmd_path;
+	char *cmd_path = NULL;
 
 	if (!argv || !argv[0])
 	{
@@ -31,32 +31,39 @@ void run_command(char **argv, char *line)
 
 		if (!cmd_path)
 		{
-			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
-			last_exit_status = 127;
-			exit(127);
+			/* check if command is a direct path */
+			if (argv[0][0] == '/' || (argv[0][0] == '.' && (argv[0][1] == '/' || (argv[0][1] == '.' && argv[0][2] == '/'))))
+			{
+				cmd_path = argv[0];
+			}
+			else
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+				exit(127);
+			}
 		}
 
 		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("./hsh");
-			free(cmd_path);
-			last_exit_status = EXIT_FAILURE;
-			exit(EXIT_FAILURE);
+			if (cmd_path != argv[0]) /* Only free if it was allocated */
+				free(cmd_path);
+			exit(127);
 		}
 	}
 	else if (pid > 0)
 	{
 		wait(&status);
-		if (WIFEXITED(status))
-			last_exit_status = WEXITSTATUS(status);
+		last_exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : EXIT_FAILURE;
 	}
 	else
 	{
 		perror("fork");
 		free(line);
-		last_exit_status = EXIT_FAILURE;
 		exit(EXIT_FAILURE);
 	}
 
 	free(line);
+	if (cmd_path && cmd_path != argv[0])
+		free(cmd_path);
 }
