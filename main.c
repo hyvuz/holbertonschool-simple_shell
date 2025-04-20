@@ -27,6 +27,13 @@ int main(void)
 			continue;
 
 		parse_input(line, argv);
+
+		if (argv[0] && strcmp(argv[0], "exit") == 0)
+		{
+			free(line);
+			exit(0);
+		}
+
 		run_command(argv, line);
 	}
 
