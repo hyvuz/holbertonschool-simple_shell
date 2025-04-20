@@ -4,7 +4,6 @@
 #include <stddef.h>
 
 extern char **environ;
-extern int last_exit_status;
 
 char *read_input(void);
 void parse_input(char *line, char **argv);
