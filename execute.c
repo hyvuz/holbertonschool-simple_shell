@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
 /**
  * run_command - Executes a command with its arguments
  * @argv: array of argument strings (argv[0] = command)
@@ -12,13 +11,13 @@
  *
  * Return: void
  */
+
 void run_command(char **argv, char *line)
 {
 	pid_t pid;
 	int status;
 	char *cmd_path;
 
-	/* Defensive check to avoid crash on empty input */
 	if (!argv || !argv[0])
 	{
 		free(line);
@@ -32,28 +31,32 @@ void run_command(char **argv, char *line)
 
 		if (!cmd_path)
 		{
-			perror("./hsh");
-			exit(EXIT_FAILURE);
+			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+			last_exit_status = 127;
+			exit(127);
 		}
 
 		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("./hsh");
 			free(cmd_path);
+			last_exit_status = EXIT_FAILURE;
 			exit(EXIT_FAILURE);
 		}
 	}
 	else if (pid > 0)
 	{
 		wait(&status);
+		if (WIFEXITED(status))
+			last_exit_status = WEXITSTATUS(status);
 	}
 	else
 	{
 		perror("fork");
 		free(line);
+		last_exit_status = EXIT_FAILURE;
 		exit(EXIT_FAILURE);
 	}
 
 	free(line);
 }
-
