@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
 /**
  * run_command - Executes a command with its arguments
  * @argv: array of argument strings (argv[0] = command)
@@ -11,13 +12,13 @@
  *
  * Return: void
  */
-
 void run_command(char **argv, char *line)
 {
 	pid_t pid;
 	int status;
-	char *cmd_path = NULL;
+	char *cmd_path;
 
+	/* Defensive check to avoid crash on empty input */
 	if (!argv || !argv[0])
 	{
 		free(line);
@@ -31,30 +32,20 @@ void run_command(char **argv, char *line)
 
 		if (!cmd_path)
 		{
-			/* check if command is a direct path */
-			if (argv[0][0] == '/' || (argv[0][0] == '.' && (argv[0][1] == '/' || (argv[0][1] == '.' && argv[0][2] == '/'))))
-			{
-				cmd_path = argv[0];
-			}
-			else
-			{
-				fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
-				exit(127);
-			}
+			perror("./hsh");
+			exit(EXIT_FAILURE);
 		}
 
 		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("./hsh");
-			if (cmd_path != argv[0]) /* Only free if it was allocated */
-				free(cmd_path);
-			exit(127);
+			free(cmd_path);
+			exit(EXIT_FAILURE);
 		}
 	}
 	else if (pid > 0)
 	{
 		wait(&status);
-		last_exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : EXIT_FAILURE;
 	}
 	else
 	{
@@ -64,6 +55,5 @@ void run_command(char **argv, char *line)
 	}
 
 	free(line);
-	if (cmd_path && cmd_path != argv[0])
-		free(cmd_path);
 }
+
