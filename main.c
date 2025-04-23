@@ -1,38 +1,41 @@
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
+#define PROMPT "#cisfun$ "
+
+/**
+ * main - Entry point for the simple shell
+ * Return: Always 0
+ */
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    char **args;
-    int status = 0;
+	char *line = NULL;
+	char *argv[100];
 
-    while (1)
-    {
-        print_prompt();
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 
-        read = read_line(&line, &len);
-        if (read == -1)
-        {
-            free(line);
-            exit(status);
-        }
+		line = read_input();
+		if (!line)
+			continue;
 
-        args = parse_line(line);
-        if (args && args[0] != NULL)
-        {
-            if (strcmp(args[0], "exit") == 0)
-                handle_exit(args, line, status);
-            else
-                status = execute_cmd(args);
-        }
+		parse_input(line, argv);
 
-        free(args);
-        free(line);
-        line = NULL;
-        len = 0;
-    }
+		if (argv[0] && strcmp(argv[0], "exit") == 0)
+		{
+			free(line);
+			exit(0);
+		}
 
-    return (status);
+		run_command(argv, line);
+	}
+
+	return (0);
 }
