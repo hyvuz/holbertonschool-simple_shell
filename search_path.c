@@ -18,7 +18,9 @@ char *search_path(char *command)
 		return (strdup(command)); /* Full path already */
 
 	path = getenv("PATH");
-	if (!path)
+
+	/* ✅ Fix: Handle both NULL and empty PATH */
+	if (!path || *path == '\0')
 		return (NULL);
 
 	path_copy = strdup(path);
