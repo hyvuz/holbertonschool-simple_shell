@@ -32,10 +32,12 @@ void run_command(char **argv, char *line)
 
 		/* ✅ Fix: custom error message & correct exit code */
 		if (!cmd_path)
-		{
-			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
-			exit(127);
-		}
+                {
+                   fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+                   free(line);
+                   exit(127);
+                }
+
 
 		if (execve(cmd_path, argv, environ) == -1)
 		{
