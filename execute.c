@@ -30,17 +30,18 @@ void run_command(char **argv, char *line)
 	{
 		cmd_path = search_path(argv[0]);
 
+		/* ✅ Fix: custom error message & correct exit code */
 		if (!cmd_path)
 		{
-			perror("./hsh");
-			exit(EXIT_FAILURE);
+			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+			exit(127);
 		}
 
 		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("./hsh");
 			free(cmd_path);
-			exit(EXIT_FAILURE);
+			exit(127);
 		}
 	}
 	else if (pid > 0)
@@ -56,4 +57,3 @@ void run_command(char **argv, char *line)
 
 	free(line);
 }
-
