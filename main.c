@@ -28,6 +28,7 @@ int main(void)
 
 		parse_input(line, argv);
 
+		/* Built-in command: exit */
 		if (argv[0] && strcmp(argv[0], "exit") == 0)
 		{
 			free(line);
@@ -35,6 +36,7 @@ int main(void)
 		}
 
 		run_command(argv, line);
+		free(line); /* Always free line after running a command */
 	}
 
 	return (0);
