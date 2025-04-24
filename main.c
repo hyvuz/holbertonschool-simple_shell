@@ -23,20 +23,30 @@ int main(void)
 			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 
 		line = read_input();
-		if (!line)
-			continue;
+		if (!line) /* Ctrl+D or EOF */
+		{
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
+			break;
+		}
 
 		parse_input(line, argv);
 
-		/* Built-in command: exit */
-		if (argv[0] && strcmp(argv[0], "exit") == 0)
+		if (argv[0] == NULL) /* skip empty lines */
+		{
+			free(line);
+			continue;
+		}
+
+		/* 🔥 Handle built-in exit */
+		if (strcmp(argv[0], "exit") == 0)
 		{
 			free(line);
 			exit(0);
 		}
 
 		run_command(argv, line);
-		free(line); /* Always free line after running a command */
+		free(line);
 	}
 
 	return (0);
