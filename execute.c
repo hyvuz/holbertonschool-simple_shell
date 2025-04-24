@@ -25,14 +25,14 @@ void run_command(char **argv, char *line)
 		return;
 	}
 
-	/* Built-in: exit */
+	/* 🔥 Built-in: exit */
 	if (strcmp(argv[0], "exit") == 0)
 	{
 		free(line);
 		exit(0);
 	}
 
-	/* Absolute or relative path */
+	/* Check if the command is a path (absolute or relative) */
 	if (argv[0][0] == '/' || (argv[0][0] == '.' && (argv[0][1] == '/' || argv[0][1] == '.')))
 	{
 		pid = fork();
@@ -57,6 +57,7 @@ void run_command(char **argv, char *line)
 	}
 	else
 	{
+		/* This uses your own search_path() function */
 		cmd_path = search_path(argv[0]);
 		if (!cmd_path)
 		{
