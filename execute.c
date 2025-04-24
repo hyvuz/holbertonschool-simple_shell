@@ -1,4 +1,3 @@
-#include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,7 +12,7 @@ extern char **environ;
  * @argv: array of strings, where argv[0] is the command
  * @line: the original input line to be freed after use
  */
-int run_command(char **argv, char *line)
+void run_command(char **argv, char *line)
 {
 	pid_t pid;
 	int status;
@@ -22,20 +21,32 @@ int run_command(char **argv, char *line)
 	if (!argv || !argv[0])
 	{
 		free(line);
-		return (0);
+		return;
 	}
 
+	/* Built-in: exit */
+	if (strcmp(argv[0], "exit") == 0)
+	{
+		free(line);
+		exit(0);
+	}
+
+	/* Absolute or relative path */
 	if (argv[0][0] == '/' || (argv[0][0] == '.' && (argv[0][1] == '/' || argv[0][1] == '.')))
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			execve(argv[0], argv, environ);
-			perror(argv[0]);
-			exit(2);  /* use 2 if command fails */
+			if (execve(argv[0], argv, environ) == -1)
+			{
+				fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+				exit(127);
+			}
 		}
 		else if (pid > 0)
+		{
 			wait(&status);
+		}
 		else
 		{
 			perror("fork");
@@ -50,16 +61,18 @@ int run_command(char **argv, char *line)
 		{
 			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
 			free(line);
-			return (127);
+			exit(127);
 		}
 
 		pid = fork();
 		if (pid == 0)
 		{
-			execve(cmd_path, argv, environ);
-			perror(cmd_path);
-			free(cmd_path);
-			exit(2);  /* use 2 for command fail */
+			if (execve(cmd_path, argv, environ) == -1)
+			{
+				perror("./hsh");
+				free(cmd_path);
+				exit(EXIT_FAILURE);
+			}
 		}
 		else if (pid > 0)
 		{
@@ -74,6 +87,4 @@ int run_command(char **argv, char *line)
 			exit(EXIT_FAILURE);
 		}
 	}
-
-	return (WEXITSTATUS(status));
 }
