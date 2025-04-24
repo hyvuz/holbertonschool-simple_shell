@@ -12,10 +12,12 @@
  * main - Entry point for the simple shell
  * Return: Always 0
  */
+
 int main(void)
 {
 	char *line = NULL;
 	char *argv[100];
+	int last_status = 0;
 
 	while (1)
 	{
@@ -23,7 +25,7 @@ int main(void)
 			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 
 		line = read_input();
-		if (!line) /* Ctrl+D or EOF */
+		if (!line)
 		{
 			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
@@ -32,22 +34,25 @@ int main(void)
 
 		parse_input(line, argv);
 
-		if (argv[0] == NULL) /* skip empty lines */
+		if (argv[0] == NULL)
 		{
 			free(line);
 			continue;
 		}
 
-		/* 🔥 Handle built-in exit */
+		/* exit should return last_status */
 		if (strcmp(argv[0], "exit") == 0)
 		{
 			free(line);
-			exit(0);
+			exit(last_status);
 		}
 
-		run_command(argv, line);
+		last_status = run_command(argv, line);
 		free(line);
 	}
+
+	return (0);
+}
 
 	return (0);
 }
